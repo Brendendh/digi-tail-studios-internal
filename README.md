@@ -26,16 +26,33 @@ npm install
 npm run dev
 # open http://localhost:5173
 ```
-
-Tailwind
-
-This project uses the `@tailwindcss/vite` plugin and imports `src/tailwind-input.css` directly from `src/main.tsx`.
-
-There is no `style.css`/`styles.css` build artifact used by the app.
-
 Encrypting your links
 
 1. Create `private-links.json` locally (do not commit it). You can copy `private-links.json.example`.
+   - Use grouped structure: each group has a `title`, optional `icon`, and an `items` array of links.
+   - Each link supports `url` (required), plus optional `title`, `notes`, and `icon`.
+   - The encryption script validates this schema and will fail fast on invalid payloads.
+
+Example structure:
+
+```json
+{
+  "groups": [
+    {
+      "title": "Work",
+      "icon": "/icons/work-group.svg",
+      "items": [
+        {
+          "title": "Example Private Link",
+          "url": "https://example.com/login",
+          "notes": "Description or notes about this link.",
+          "icon": "/icons/work-link.svg"
+        }
+      ]
+    }
+  ]
+}
+```
 2. Encrypt with a passphrase (do not put passphrase in the repo):
 
 ```bash

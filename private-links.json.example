@@ -1,6 +1,19 @@
 {
-  "items": [
-    { "title": "Example Private Link", "url": "https://example.com/login", "notes": "Description or notes about this link." }
+  "groups": [
+    {
+      "title": "Work",
+      "icon": "/icons/work-group.svg",
+      "items": [
+        { "title": "Example Private Link", "url": "https://example.com/login", "notes": "Description or notes about this link.", "icon": "/icons/work-link.svg" }
+      ]
+    },
+    {
+      "title": "Personal",
+      "icon": "/icons/personal-group.svg",
+      "items": [
+        { "title": "Example Dashboard", "url": "https://example.com/dashboard", "notes": "Another grouped item example.", "icon": "/icons/personal-dashboard.svg" }
+      ]
+    }
   ]
 }
 

@@ -32,6 +32,42 @@ function getPassFromArgs() {
   return null
 }
 
+function isRecord(value) {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isOptionalString(value) {
+  return value === undefined || typeof value === 'string'
+}
+
+function isRequiredString(value) {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function validateLinksPayload(value) {
+  if (!isRecord(value)) return 'Root must be an object.'
+  if (!Array.isArray(value.groups)) return '"groups" must be an array.'
+
+  for (let groupIndex = 0; groupIndex < value.groups.length; groupIndex++) {
+    const group = value.groups[groupIndex]
+    if (!isRecord(group)) return `groups[${groupIndex}] must be an object.`
+    if (!isRequiredString(group.title)) return `groups[${groupIndex}].title must be a non-empty string.`
+    if (!isOptionalString(group.icon)) return `groups[${groupIndex}].icon must be a string.`
+    if (!Array.isArray(group.items)) return `groups[${groupIndex}].items must be an array.`
+
+    for (let itemIndex = 0; itemIndex < group.items.length; itemIndex++) {
+      const item = group.items[itemIndex]
+      if (!isRecord(item)) return `groups[${groupIndex}].items[${itemIndex}] must be an object.`
+      if (!isRequiredString(item.url)) return `groups[${groupIndex}].items[${itemIndex}].url must be a non-empty string.`
+      if (!isOptionalString(item.title)) return `groups[${groupIndex}].items[${itemIndex}].title must be a string.`
+      if (!isOptionalString(item.notes)) return `groups[${groupIndex}].items[${itemIndex}].notes must be a string.`
+      if (!isOptionalString(item.icon)) return `groups[${groupIndex}].items[${itemIndex}].icon must be a string.`
+    }
+  }
+
+  return null
+}
+
 async function run() {
   const pass = getPassFromArgs()
   if (!pass) {
@@ -39,7 +75,23 @@ async function run() {
     process.exit(1)
   }
 
-  const plain = fs.readFileSync(inFile, 'utf8')
+  const plainText = fs.readFileSync(inFile, 'utf8')
+  let payload
+  try {
+    payload = JSON.parse(plainText)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`private-links.json is not valid JSON: ${message}`)
+    process.exit(1)
+  }
+
+  const validationError = validateLinksPayload(payload)
+  if (validationError) {
+    console.error(`private-links.json schema error: ${validationError}`)
+    process.exit(1)
+  }
+
+  const plain = JSON.stringify(payload)
 
   const salt = crypto.randomBytes(16)
   const iv = crypto.randomBytes(12)

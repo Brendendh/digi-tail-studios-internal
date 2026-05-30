@@ -1,4 +1,9 @@
 import React, { useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Input } from './ui/input'
+import { parseLinksPayload } from '../lib/links-schema'
+import type { LinksPayload } from '../lib/links-schema'
 
 interface EncObject {
   version?: number
@@ -25,7 +30,7 @@ async function deriveKey(password: string, saltB64: string, iterations = 150000)
   return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations, hash: 'SHA-256' } as Pbkdf2Params, passKey, { name: 'AES-GCM', length: 256 } as AesKeyGenParams, false, ['decrypt'])
 }
 
-async function decryptPayload(password: string, encObj: EncObject) {
+async function decryptPayload(password: string, encObj: EncObject): Promise<unknown> {
   const key = await deriveKey(password, encObj.salt, encObj.iterations || 150000)
   const iv = b64ToBuf(encObj.iv)
   const cipherBuf = b64ToBuf(encObj.ciphertext)
@@ -40,7 +45,7 @@ async function decryptPayload(password: string, encObj: EncObject) {
   return JSON.parse(decoder.decode(plainBuf))
 }
 
-export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data: any) => void }>) {
+export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data: LinksPayload) => void }>) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,44 +55,47 @@ export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data:
     setLoading(true)
     setError(null)
     try {
+      // @ts-ignore
       const encUrl = `${import.meta.env.BASE_URL}private-links.enc.json`
       const res = await fetch(encUrl, { cache: 'no-store' })
       if (!res.ok) throw new Error('Encrypted links file not found. (Have you added public/private-links.enc.json?)')
       const encObj = (await res.json()) as EncObject
-      const decrypted = await decryptPayload(password, encObj)
+      const decrypted = parseLinksPayload(await decryptPayload(password, encObj))
       onDecrypt(decrypted)
     } catch (err) {
       console.error(err)
-      setError('Failed to decrypt — check password or encrypted file.')
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Failed to decrypt — check password or encrypted file.')
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="rounded-lg border border-[#DAD2CA] bg-white/60 p-6 shadow-sm">
-      <form className="flex gap-3 items-center" onSubmit={tryDecrypt}>
-        <input
-          className="flex-1 rounded-md border border-[#DAD2CA] bg-[#E5DABF] px-3 py-2 text-[#1D0D12]"
-          type="password"
-          placeholder="Enter password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          aria-label="password"
-        />
-        <button
-          className="rounded-md bg-[#B9CCCC] px-4 py-2 font-semibold text-[#1D0D12] disabled:opacity-60"
-          disabled={loading}
-          onClick={() => tryDecrypt()}
-        >
-          {loading ? 'Decrypting...' : 'Unlock'}
-        </button>
-      </form>
-      {error && <div className="text-red-700 mt-3">{error}</div>}
-      <p className="mt-3 text-sm text-black/60">
-        The encrypted file <code>public/private-links.enc.json</code> is fetched and decrypted client-side.
-      </p>
-    </div>
+    <Card className="animate-[fade-up_500ms_ease-out]">
+      <CardHeader>
+        <CardTitle>Enter Password</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center" onSubmit={tryDecrypt}>
+          <Input
+            className="flex-1"
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-label="password"
+          />
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Decrypting...' : 'Unlock'}
+          </Button>
+        </form>
+        {error && <div className="mt-3 rounded-md border border-red-300/70 bg-red-100/55 px-3 py-2 text-sm text-red-700">{error}</div>}
+      </CardContent>
+    </Card>
   )
 }
 
