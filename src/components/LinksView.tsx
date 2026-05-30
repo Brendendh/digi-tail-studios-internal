@@ -124,9 +124,10 @@ export default function LinksView({ links }: Readonly<{ links: LinksPayload | nu
                 <CardContent
                   id={getGroupId(groupIndex, group.title)}
                   className={cn(
-                    'overflow-hidden p-0 transition-[max-height,opacity] duration-300 ease-out',
-                    isOpen ? 'max-h-300 opacity-100' : 'max-h-0 opacity-0',
+                    'overflow-hidden p-0 transition-[max-height,opacity,visibility] duration-300 ease-out',
+                    isOpen ? 'max-h-300 opacity-100' : 'max-h-0 opacity-0 invisible',
                   )}
+                  inert={!isOpen ? '' : undefined}
                 >
                   <ul className="space-y-2 px-5 pb-5 pt-2">
                     {group.items.map((item, itemIndex) => (
