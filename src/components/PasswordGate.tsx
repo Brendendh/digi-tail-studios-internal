@@ -50,8 +50,9 @@ export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data:
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/private-links.enc.json', { cache: 'no-store' })
-      if (!res.ok) throw new Error('Encrypted links file not found. (Have you added private-links.enc.json?)')
+      const encUrl = `${import.meta.env.BASE_URL}private-links.enc.json`
+      const res = await fetch(encUrl, { cache: 'no-store' })
+      if (!res.ok) throw new Error('Encrypted links file not found. (Have you added public/private-links.enc.json?)')
       const encObj = (await res.json()) as EncObject
       const decrypted = await decryptPayload(password, encObj)
       onDecrypt(decrypted)
@@ -84,7 +85,7 @@ export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data:
       </form>
       {error && <div className="text-red-700 mt-3">{error}</div>}
       <p className="mt-3 text-sm text-black/60">
-        The encrypted file <code>private-links.enc.json</code> is fetched and decrypted client-side.
+        The encrypted file <code>public/private-links.enc.json</code> is fetched and decrypted client-side.
       </p>
     </div>
   )

@@ -1,11 +1,11 @@
 # Private Links site (React + Vite)
 
-This repository is a lightweight React + Vite site intended to be hosted on GitHub Pages. It implements a client-side password gate that decrypts an encrypted `private-links.enc.json` file in the browser.
+This repository is a lightweight React + Vite site intended to be hosted on GitHub Pages. It implements a client-side password gate that decrypts an encrypted `public/private-links.enc.json` file in the browser.
 
 High-level workflow
 - Keep a local `private-links.json` (not committed).
-- Run the encryption script locally with your passphrase to generate `private-links.enc.json` and commit that encrypted file to the public repo.
-- The website fetches `private-links.enc.json` and decrypts it client-side when the user enters the correct passphrase.
+- Run the encryption script locally with your passphrase to generate `public/private-links.enc.json` and commit that encrypted file to the public repo.
+- The website fetches `private-links.enc.json` from the app base URL and decrypts it client-side when the user enters the correct passphrase.
 
 Security notes (important)
 - Do NOT commit unencrypted secrets to the public repo. `private-links.json` is included as an example only.
@@ -46,7 +46,7 @@ PASSPHRASE="YourSecretPassphrase" npm run encrypt-links
 node scripts/encrypt-links.js --pass "YourSecretPassphrase"
 ```
 
-3. Commit `private-links.enc.json` (the encrypted file) to the public repo. The encrypted file is safe to store in the public repo.
+3. Commit `public/private-links.enc.json` (the encrypted file) to the public repo. The encrypted file is safe to store in the public repo.
 
 Deploy to GitHub Pages
 

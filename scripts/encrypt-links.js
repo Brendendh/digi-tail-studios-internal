@@ -6,7 +6,7 @@
       or: node scripts/encrypt-links.js --pass "yourPassword"
 
   This script uses PBKDF2 (SHA-256) and AES-256-GCM. It outputs
-  `private-links.enc.json` which contains base64-encoded salt, iv, ciphertext and tag.
+  `public/private-links.enc.json` which contains base64-encoded salt, iv, ciphertext and tag.
 
   IMPORTANT: Do NOT commit unencrypted `private-links.json` to your public repo.
 */
@@ -16,7 +16,7 @@ const crypto = require('node:crypto')
 const path = require('node:path')
 
 const inFile = path.resolve(process.cwd(), 'private-links.json')
-const outFile = path.resolve(process.cwd(), 'private-links.enc.json')
+const outFile = path.resolve(process.cwd(), 'public', 'private-links.enc.json')
 
 if (!fs.existsSync(inFile)) {
   console.error('Missing private-links.json. Create it from private-links.json.example and DO NOT commit it.')
@@ -59,6 +59,7 @@ async function run() {
     tag: tag.toString('base64')
   }
 
+  fs.mkdirSync(path.dirname(outFile), { recursive: true })
   fs.writeFileSync(outFile, JSON.stringify(out, null, 2), 'utf8')
   console.log('Wrote', outFile, "-- add this encrypted file to your repo. Keep the passphrase private.")
 }
