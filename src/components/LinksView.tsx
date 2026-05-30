@@ -12,6 +12,18 @@ function getGroupId(index: number, title: string) {
   return `group-${index}-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
 }
 
+function resolveIconUrl(iconPath: string | undefined): string | undefined {
+  if (!iconPath) return undefined
+  if (iconPath.startsWith('http://') || iconPath.startsWith('https://') || iconPath.startsWith('data:')) {
+    return iconPath
+  }
+  const baseUrl = import.meta.env.BASE_URL
+  if (iconPath.startsWith('/')) {
+    return `${baseUrl}${iconPath.slice(1)}`
+  }
+  return `${baseUrl}${iconPath}`
+}
+
 export default function LinksView({ links }: Readonly<{ links: LinksPayload | null }>) {
   const groups = useMemo(() => links?.groups ?? [], [links?.groups])
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
@@ -83,7 +95,7 @@ export default function LinksView({ links }: Readonly<{ links: LinksPayload | nu
                     <div className="flex items-center gap-3">
                       {group.icon ? (
                         <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-(--extra-foam) bg-white/70 p-1">
-                          <img src={group.icon} alt="" className="h-full w-full object-contain" />
+                          <img src={resolveIconUrl(group.icon)} alt="" className="h-full w-full object-contain" />
                         </span>
                       ) : (
                         <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-(--extra-foam) bg-white/70 text-[10px] font-semibold uppercase tracking-wide text-black/60">
@@ -128,7 +140,7 @@ export default function LinksView({ links }: Readonly<{ links: LinksPayload | nu
                           <div className="flex items-start gap-3">
                             {item.icon ? (
                               <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-(--extra-foam) bg-white/70 p-1">
-                                <img src={item.icon} alt="" className="h-full w-full object-contain" />
+                                <img src={resolveIconUrl(item.icon)} alt="" className="h-full w-full object-contain" />
                               </span>
                             ) : (
                               <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-(--extra-foam) bg-white/70 text-[10px] font-semibold uppercase tracking-wide text-black/60">
