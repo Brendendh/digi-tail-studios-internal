@@ -65,7 +65,11 @@ export default function PasswordGate({ onDecrypt }: Readonly<{ onDecrypt: (data:
     } catch (err) {
       console.error(err)
       if (err instanceof Error) {
-        setError(err.message)
+        if (err.name === 'OperationError' || err.message.includes('operation-specific reason')) {
+          setError('Incorrect password. Please try again.')
+        } else {
+          setError(err.message)
+        }
       } else {
         setError('Failed to decrypt — check password or encrypted file.')
       }
