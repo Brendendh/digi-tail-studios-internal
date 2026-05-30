@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "iterations": 150000,
+  "salt": "PuG1+U0BZ1+4QWCcoMrbQQ==",
+  "iv": "aDLAiZEio6/yiz/I",
+  "ciphertext": "N6MAerJv/VzloIsa1BrNQQg6wFp1IQ67ePHoJ59T/BmYWWXhTRPnOCHD0PqZ+G9ClTD9jj4+J2mqoJCZEj95gZ7n/fIAsDMNBgvSuopUOKa+gy6UZjGNK0fBmo5RKaT1so8ZXNcqmSmjDHTQ1Ku3T1aOQmY0G7xCmhkuexyVijTR8xzw672TGsq3z7ItVhBIkEgT",
+  "tag": "aekvlnzbZp8n3bC9pefryg=="
+}

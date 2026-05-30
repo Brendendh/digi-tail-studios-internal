@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimal custom properties to keep palette available to non-tailwind places */
+:root{
+  --long-black: #1D0D12;
+  --flat-white: #E5DABF;
+  --extra-foam: #DAD2CA;
+  --arctic-willow: #B9CCCC;
+  --winter-coat: #D2FBFA;
+  --frozen-juniper: #D2FBFA;
+}
